@@ -1,3 +1,6 @@
+# This workflow scrapes the latest audio files from Radio Okapi, processes them, and uploads them to the repository.
+# The workflow runs weekly on Sundays at 6 AM UTC, but can also be triggered manually.
+
 name: Weekly Radio Okapi Scraper
 
 on:
