@@ -12,89 +12,89 @@ audioread>=3.0.0
 # Video/Audio downloading
 yt-dlp>=2023.7.6
 
-# Data processing
-pandas>=2.0.0
-numpy>=1.24.0
-scipy>=1.10.0
+# # Data processing
+# pandas>=2.0.0
+# numpy>=1.24.0
+# scipy>=1.10.0
 
-# Speech processing
-whisper-openai>=20230314
-speechrecognition>=3.10.0
-pyaudio>=0.2.11
+# # Speech processing
+# whisper-openai>=20230314
+# speechrecognition>=3.10.0
+# pyaudio>=0.2.11
 
-# Audio augmentation
-audiomentations>=1.4.0
-pyroomacoustics>=0.7.0
+# # Audio augmentation
+# audiomentations>=1.4.0
+# pyroomacoustics>=0.7.0
 
-# Machine Learning
-torch>=2.0.0
-torchaudio>=2.0.0
-transformers>=4.30.0
-datasets>=2.13.0
+# # Machine Learning
+# torch>=2.0.0
+# torchaudio>=2.0.0
+# transformers>=4.30.0
+# datasets>=2.13.0
 
-# Text processing
-nltk>=3.8.0
-spacy>=3.6.0
-regex>=2023.6.3
+# # Text processing
+# nltk>=3.8.0
+# spacy>=3.6.0
+# regex>=2023.6.3
 
-# Web scraping utilities
-selenium>=4.10.0
-fake-useragent>=1.2.0
+# # Web scraping utilities
+# selenium>=4.10.0
+# fake-useragent>=1.2.0
 
-# Progress tracking
-tqdm>=4.65.0
-rich>=13.4.0
+# # Progress tracking
+# tqdm>=4.65.0
+# rich>=13.4.0
 
-# Development tools
-jupyter>=1.0.0
-ipywidgets>=8.0.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
+# # Development tools
+# jupyter>=1.0.0
+# ipywidgets>=8.0.0
+# matplotlib>=3.7.0
+# seaborn>=0.12.0
 
-# Annotation tools
-label-studio>=1.8.0
-streamlit>=1.24.0
+# # Annotation tools
+# label-studio>=1.8.0
+# streamlit>=1.24.0
 
-# Data validation
-pydantic>=2.0.0
-jsonschema>=4.17.0
+# # Data validation
+# pydantic>=2.0.0
+# jsonschema>=4.17.0
 
 # Logging and monitoring
-wandb>=0.15.0
-tensorboard>=2.13.0
+# wandb>=0.15.0
+# tensorboard>=2.13.0
 
-# Testing
-pytest>=7.4.0
-pytest-cov>=4.1.0
+# # Testing
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
 
-# Utility libraries
-python-dotenv>=1.0.0
-click>=8.1.0
-pathlib2>=2.3.7
-humanize>=4.7.0
+# # Utility libraries
+# python-dotenv>=1.0.0
+# click>=8.1.0
+# pathlib2>=2.3.7
+# humanize>=4.7.0
 
-# Audio format support
-ffmpeg-python>=0.2.0
+# # Audio format support
+# ffmpeg-python>=0.2.0
 
-# Database (optional)
-sqlite3
+# # Database (optional)
+# sqlite3
 
-# Async support
-aiohttp>=3.8.0
-asyncio
+# # Async support
+# aiohttp>=3.8.0
+# asyncio
 
-# Configuration
-pyyaml>=6.0.0
-toml>=0.10.0
+# # Configuration
+# pyyaml>=6.0.0
+# toml>=0.10.0
 
-# Model serving (optional)
-fastapi>=0.100.0
-uvicorn>=0.22.0
+# # Model serving (optional)
+# fastapi>=0.100.0
+# uvicorn>=0.22.0
 
-# Audio quality analysis
-pesq>=0.0.4
-pystoi>=0.3.3
+# # Audio quality analysis
+# pesq>=0.0.4
+# pystoi>=0.3.3
 
-# Language detection
-langdetect>=1.0.9
-polyglot>=16.7.4
+# # Language detection
+# langdetect>=1.0.9
+# polyglot>=16.7.4
