@@ -1,0 +1,161 @@
+name: Weekly Radio Okapi Scraper
+
+on:
+  # Run every Sunday at 6 AM UTC
+  schedule:
+    - cron: '0 6 * * 0'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      article_count:
+        description: 'Number of latest articles to download'
+        required: false
+        default: '20'
+        type: string
+      force_full_scan:
+        description: 'Force full range scan instead of latest'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  OUTPUT_DIR: 'data/raw/okapi'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  scrape-okapi:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        lfs: true  # Enable Git LFS for audio files
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 lxml
+        
+    - name: Setup Git LFS for audio files
+      run: |
+        git lfs install
+        if [ ! -f .gitattributes ] || ! grep -q "*.mp3" .gitattributes; then
+          echo "*.mp3 filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+          git add .gitattributes
+        fi
+        
+    - name: Create output directories
+      run: |
+        mkdir -p ${{ env.OUTPUT_DIR }}
+        mkdir -p ${{ env.OUTPUT_DIR }}/metadata
+        mkdir -p logs
+        
+    - name: Run scraper
+      id: scrape
+      run: |
+        # Set parameters based on input
+        ARTICLE_COUNT="${{ github.event.inputs.article_count || '20' }}"
+        FORCE_FULL="${{ github.event.inputs.force_full_scan || 'false' }}"
+        
+        if [ "$FORCE_FULL" = "true" ]; then
+          echo "Running full range scan..."
+          python scripts/download_okapi_auto.py \
+            --out "${{ env.OUTPUT_DIR }}" \
+            --threads 3 \
+            --incremental \
+            --metadata \
+            --manifest
+        else
+          echo "Downloading latest $ARTICLE_COUNT articles..."
+          python scripts/download_okapi_auto.py \
+            --out "${{ env.OUTPUT_DIR }}" \
+            --latest "$ARTICLE_COUNT" \
+            --threads 3 \
+            --incremental \
+            --metadata \
+            --manifest
+        fi
+        
+        # Get statistics
+        AUDIO_COUNT=$(find ${{ env.OUTPUT_DIR }} -name "*.mp3" | wc -l)
+        TOTAL_SIZE=$(du -sh ${{ env.OUTPUT_DIR }} | cut -f1)
+        NEW_FILES=$(find ${{ env.OUTPUT_DIR }} -name "*.mp3" -mtime -1 | wc -l)
+        
+        echo "audio_count=$AUDIO_COUNT" >> $GITHUB_OUTPUT
+        echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+        echo "new_files=$NEW_FILES" >> $GITHUB_OUTPUT
+        
+    - name: Generate download report
+      run: |
+        echo "# 📻 Radio Okapi Weekly Download Report" > download_report.md
+        echo "" >> download_report.md
+        echo "**Date:** $(date -u)" >> download_report.md
+        echo "**New files:** ${{ steps.scrape.outputs.new_files }}" >> download_report.md
+        echo "**Total audio files:** ${{ steps.scrape.outputs.audio_count }}" >> download_report.md
+        echo "**Total dataset size:** ${{ steps.scrape.outputs.total_size }}" >> download_report.md
+        echo "" >> download_report.md
+        
+        echo "## 🆕 Latest Downloads" >> download_report.md
+        find ${{ env.OUTPUT_DIR }} -name "*.mp3" -mtime -1 -exec basename {} \; | head -10 >> download_report.md
+        
+        echo "" >> download_report.md
+        echo "## 📊 Dataset Statistics" >> download_report.md
+        echo "- Language: Lingala (ln)" >> download_report.md
+        echo "- Source: Radio Okapi" >> download_report.md
+        echo "- Format: MP3" >> download_report.md
+        echo "- Use case: Speech-to-Text training" >> download_report.md
+        
+    - name: Check for new files
+      id: changes
+      run: |
+        git add .
+        if git diff --staged --quiet; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "No new files to commit"
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "New files found: ${{ steps.scrape.outputs.new_files }}"
+        fi
+        
+    - name: Commit and push changes
+      if: steps.changes.outputs.has_changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action Bot"
+        
+        git add .
+        git commit -m "🎵 Weekly scrape: +${{ steps.scrape.outputs.new_files }} files (Total: ${{ steps.scrape.outputs.audio_count }})"
+        git push
+        
+    - name: Create release for new files
+      if: steps.changes.outputs.has_changes == 'true' && steps.scrape.outputs.new_files > 0
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: weekly-${{ github.run_number }}
+        name: "📻 Weekly Okapi Audio - ${{ github.run_number }}"
+        body_path: download_report.md
+        files: |
+          ${{ env.OUTPUT_DIR }}/manifest.json
+        
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: radio-okapi-weekly-${{ github.run_number }}
+        path: |
+          ${{ env.OUTPUT_DIR }}/*.mp3
+          ${{ env.OUTPUT_DIR }}/manifest.json
+          ${{ env.OUTPUT_DIR }}/metadata/
+          download_report.md
+          logs/
+        retention-days: 30
