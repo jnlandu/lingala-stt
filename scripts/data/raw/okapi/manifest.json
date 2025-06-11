@@ -1,0 +1,86 @@
+[
+  {
+    "audio_path": "raw/okapi/24012023-p-l-journallingalamatin-web_0.mp3",
+    "filename": "24012023-p-l-journallingalamatin-web_0.mp3",
+    "title": "Journal Lingala Matin | Radio Okapi",
+    "article_number": 4,
+    "date": "24/01/2023",
+    "source": "radio_okapi",
+    "source_url": "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-4",
+    "file_size": 2060064,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
+    "audio_path": "raw/okapi/23012023-p-l-journallingalamatin-web.mp3",
+    "filename": "23012023-p-l-journallingalamatin-web.mp3",
+    "title": "Journal Lingala Matin | Radio Okapi",
+    "article_number": 3,
+    "date": "23/01/2023",
+    "source": "radio_okapi",
+    "source_url": "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-3",
+    "file_size": 1714464,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
+    "audio_path": "raw/okapi/25012023-p-l-journallingalamatin-web.mp3",
+    "filename": "25012023-p-l-journallingalamatin-web.mp3",
+    "title": "Journal lingala Matin | Radio Okapi",
+    "article_number": 5,
+    "date": "25/01/2023",
+    "source": "radio_okapi",
+    "source_url": "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-5",
+    "file_size": 1835424,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
+    "audio_path": "raw/okapi/20012023-p-l-journallingalamatinwweb.mp3",
+    "filename": "20012023-p-l-journallingalamatinwweb.mp3",
+    "title": "Journal Lingala Matin | Radio Okapi",
+    "article_number": 2,
+    "date": "20/01/2023",
+    "source": "radio_okapi",
+    "source_url": "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-2",
+    "file_size": 2039760,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
+    "audio_path": "raw/okapi/12062025-p-l-journallingalamatin-00web.mp3",
+    "filename": "12062025-p-l-journallingalamatin-00web.mp3",
+    "title": "12062025-p-l-journallingalamatin-00web",
+    "article_number": null,
+    "date": null,
+    "source": "radio_okapi",
+    "source_url": null,
+    "file_size": 1982304,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
+    "audio_path": "raw/okapi/19012023-p-l-journallingalamatin-web.mp3",
+    "filename": "19012023-p-l-journallingalamatin-web.mp3",
+    "title": "Journal Lingala Matin | Radio Okapi",
+    "article_number": 1,
+    "date": "19/01/2023",
+    "source": "radio_okapi",
+    "source_url": "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-1",
+    "file_size": 2087568,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
+    "audio_path": "raw/okapi/10062025-p-l-journallingalamatin-00mp3.mp3",
+    "filename": "10062025-p-l-journallingalamatin-00mp3.mp3",
+    "title": "10062025-p-l-journallingalamatin-00mp3",
+    "article_number": null,
+    "date": null,
+    "source": "radio_okapi",
+    "source_url": null,
+    "file_size": 2678016,
+    "language": "ln",
+    "needs_transcription": true
+  }
+]
