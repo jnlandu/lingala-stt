@@ -1,4 +1,4 @@
-name: Radio Okapi Lingala Scraper
+name: Radio Okapi Daily Lingala Scraper
 
 on:
   # Run every 12 hours at 6 AM and 6 PM UTC
