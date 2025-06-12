@@ -1,0 +1,17 @@
+2025-06-12 10:21:08,332 - INFO - 🔍 Finding valid article range...
+2025-06-12 10:21:08,333 - INFO - 🚀 Starting scrape of articles 180 to 192
+2025-06-12 10:21:08,333 - INFO - 📁 Output directory: data/raw/okapi
+2025-06-12 10:21:08,333 - INFO - 🧵 Using 3 threads
+2025-06-12 10:21:08,333 - INFO - 🔄 Incremental mode: True
+2025-06-12 10:21:08,333 - INFO - 📊 Processing 13 articles
+2025-06-12 10:21:08,980 - INFO - ⬇️  Downloading: 23052025-p-l-journallingalamatin-00web.mp3
+2025-06-12 10:21:10,123 - INFO - ✅ Downloaded: 23052025-p-l-journallingalamatin-00web.mp3 (1.9 MB)
+2025-06-12 10:21:10,232 - INFO - ⬇️  Downloading: 22052025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:21:10,725 - ERROR - ❌ Download failed for 22052025-p-l-journallingalamatin-00.mp3: 404 Client Error: Not Found for url: https://www.radiookapi.net/sites/default/files/2025-05/22052025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:21:10,831 - INFO - ⬇️  Downloading: 26052025-p-l-journallingalamatin-00web.mp3
+2025-06-12 10:21:12,020 - INFO - ✅ Downloaded: 26052025-p-l-journallingalamatin-00web.mp3 (1.9 MB)
+2025-06-12 10:21:12,128 - INFO - ⬇️  Downloading: 3-0052025-p-l-journallingalamatin-00web.mp3
+2025-06-12 10:21:13,199 - INFO - ✅ Downloaded: 3-0052025-p-l-journallingalamatin-00web.mp3 (2.0 MB)
+2025-06-12 10:21:13,307 - INFO - ⬇️  Downloading: 27052025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:21:13,794 - ERROR - ❌ Download failed for 27052025-p-l-journallingalamatin-00.mp3: 404 Client Error: Not Found for url: https://www.radiookapi.net/sites/default/files/2025-05/27052025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:21:13,902 - INFO - ⬇️  Downloading: 28052025-p-l-journallingalamatin-00mp3web.mp3
