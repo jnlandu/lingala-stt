@@ -1,4 +1,4 @@
-name: Radio Okapi Lingala Scraper
+name: Radio Okapi Daily Lingala Scraper
 
 on:
   # Run every 12 hours at 6 AM and 6 PM UTC
@@ -10,9 +10,14 @@ on:
   workflow_dispatch:
     inputs:
       article_count:
-        description: 'Number of latest articles to download'
+        description: 'Number of past articles to download'
         required: false
-        default: '20'
+        default: '10'
+        type: string
+      start_from:
+        description: 'Start from article number (leave empty for auto-detect)'
+        required: false
+        default: ''
         type: string
       force_full_scan:
         description: 'Force full range scan instead of latest'
@@ -38,7 +43,7 @@ jobs:
         lfs: true
         
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5  # Updated to v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
@@ -61,15 +66,75 @@ jobs:
         mkdir -p ${{ env.OUTPUT_DIR }}/metadata
         mkdir -p logs
         
-    - name: Run scraper (every 12 hours - 20 articles)
+    - name: Find latest available article
+      id: find_latest
+      run: |
+        echo "🔍 Finding latest available article..."
+        
+        # Start from a reasonable number and work backwards
+        START_NUM=200
+        LATEST_FOUND=0
+        
+        # Check articles going backwards to find the latest working one
+        for i in $(seq $START_NUM -1 1); do
+          echo "Testing article $i..."
+          
+          # Quick test without downloading
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-$i" || echo "000")
+          
+          if [ "$RESPONSE" = "200" ]; then
+            LATEST_FOUND=$i
+            echo "✅ Found latest working article: $i"
+            break
+          elif [ "$RESPONSE" = "404" ]; then
+            echo "❌ Article $i not found"
+          else
+            echo "⚠️ Article $i returned status: $RESPONSE"
+          fi
+          
+          # Small delay to be respectful
+          sleep 0.5
+        done
+        
+        if [ $LATEST_FOUND -eq 0 ]; then
+          echo "❌ No working articles found!"
+          exit 1
+        fi
+        
+        echo "latest_article=$LATEST_FOUND" >> $GITHUB_OUTPUT
+        echo "📊 Latest available article: $LATEST_FOUND"
+        
+    - name: Run scraper (past articles only)
       id: scrape
       run: |
-        # Use 20 articles by default, or custom input
-        ARTICLE_COUNT="${{ github.event.inputs.article_count || '20' }}"
+        # Get parameters
+        ARTICLE_COUNT="${{ github.event.inputs.article_count || '10' }}"
+        START_FROM="${{ github.event.inputs.start_from }}"
         FORCE_FULL="${{ github.event.inputs.force_full_scan || 'false' }}"
+        LATEST_ARTICLE="${{ steps.find_latest.outputs.latest_article }}"
         
-        echo "🚀 Starting 12-hour scrape cycle..."
+        echo "🚀 Starting backward scrape..."
         echo "📊 Target articles: $ARTICLE_COUNT"
+        echo "🎯 Latest found article: $LATEST_ARTICLE"
+        
+        if [ -n "$START_FROM" ]; then
+          # Use custom start point
+          END_NUM=$START_FROM
+          START_NUM=$((START_FROM - ARTICLE_COUNT + 1))
+          echo "🎯 Using custom range: $START_NUM to $END_NUM"
+        else
+          # Calculate range from latest found article going backwards
+          END_NUM=$LATEST_ARTICLE
+          START_NUM=$((LATEST_ARTICLE - ARTICLE_COUNT + 1))
+          echo "🎯 Auto-detected range: $START_NUM to $END_NUM"
+        fi
+        
+        # Ensure we don't go below 1
+        if [ $START_NUM -lt 1 ]; then
+          START_NUM=1
+        fi
+        
+        echo "📥 Downloading articles $START_NUM to $END_NUM..."
         
         if [ "$FORCE_FULL" = "true" ]; then
           echo "🔄 Running full range scan..."
@@ -80,10 +145,10 @@ jobs:
             --metadata \
             --manifest
         else
-          echo "📥 Downloading latest $ARTICLE_COUNT articles..."
           python scripts/download_okapi.py \
+            --start $START_NUM \
+            --end $END_NUM \
             --out "${{ env.OUTPUT_DIR }}" \
-            --latest "$ARTICLE_COUNT" \
             --threads 3 \
             --incremental \
             --metadata \
@@ -92,30 +157,35 @@ jobs:
         
         # Get statistics
         AUDIO_COUNT=$(find ${{ env.OUTPUT_DIR }} -name "*.mp3" | wc -l)
-        TOTAL_SIZE=$(du -sh ${{ env.OUTPUT_DIR }} | cut -f1)
+        TOTAL_SIZE=$(du -sh ${{ env.OUTPUT_DIR }} | cut -f1 2>/dev/null || echo "0B")
         NEW_FILES=$(find ${{ env.OUTPUT_DIR }} -name "*.mp3" -mtime -1 | wc -l)
         
         echo "audio_count=$AUDIO_COUNT" >> $GITHUB_OUTPUT
         echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
         echo "new_files=$NEW_FILES" >> $GITHUB_OUTPUT
+        echo "start_num=$START_NUM" >> $GITHUB_OUTPUT
+        echo "end_num=$END_NUM" >> $GITHUB_OUTPUT
         
         echo "✅ Scrape completed!"
         echo "📊 Total files: $AUDIO_COUNT"
         echo "🆕 New files: $NEW_FILES"
         echo "💾 Dataset size: $TOTAL_SIZE"
+        echo "📄 Range processed: $START_NUM-$END_NUM"
         
     - name: Generate download report
       run: |
         TIMESTAMP=$(date -u)
-        RUN_TYPE="Scheduled (every 12 hours)"
+        RUN_TYPE="Scheduled (every 12 hours - backward crawl)"
         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          RUN_TYPE="Manual trigger"
+          RUN_TYPE="Manual trigger - backward crawl"
         fi
         
         echo "# 📻 Radio Okapi Download Report" > download_report.md
         echo "" >> download_report.md
         echo "**Run type:** $RUN_TYPE" >> download_report.md
         echo "**Timestamp:** $TIMESTAMP" >> download_report.md
+        echo "**Latest article found:** ${{ steps.find_latest.outputs.latest_article }}" >> download_report.md
+        echo "**Articles processed:** ${{ steps.scrape.outputs.start_num }}-${{ steps.scrape.outputs.end_num }}" >> download_report.md
         echo "**New files this run:** ${{ steps.scrape.outputs.new_files }}" >> download_report.md
         echo "**Total audio files:** ${{ steps.scrape.outputs.audio_count }}" >> download_report.md
         echo "**Total dataset size:** ${{ steps.scrape.outputs.total_size }}" >> download_report.md
@@ -129,10 +199,11 @@ jobs:
         fi
         
         echo "" >> download_report.md
-        echo "## ⏰ Schedule" >> download_report.md
-        echo "- Runs every 12 hours (6 AM & 6 PM UTC)" >> download_report.md
-        echo "- Downloads latest 20 articles per run" >> download_report.md
-        echo "- Uses incremental mode (skips existing files)" >> download_report.md
+        echo "## ⏰ Strategy" >> download_report.md
+        echo "- **Auto-detect latest:** Finds highest available article number" >> download_report.md
+        echo "- **Backward crawl:** Downloads past articles that exist" >> download_report.md
+        echo "- **Default count:** 10 articles per run" >> download_report.md
+        echo "- **Incremental:** Skips already downloaded files" >> download_report.md
         
         echo "" >> download_report.md
         echo "## 📊 Dataset Info" >> download_report.md
@@ -157,7 +228,7 @@ jobs:
       if: steps.changes.outputs.has_changes == 'true'
       run: |
         git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action - 12h Scraper"
+        git config --local user.name "GitHub Action - Backward Scraper"
         
         # Determine commit message based on time
         HOUR=$(date -u +%H)
@@ -167,14 +238,18 @@ jobs:
           TIME_SLOT="Evening"
         fi
         
+        RANGE="${{ steps.scrape.outputs.start_num }}-${{ steps.scrape.outputs.end_num }}"
+        
         git add .
-        git commit -m "🎵 $TIME_SLOT scrape: +${{ steps.scrape.outputs.new_files }} files | Total: ${{ steps.scrape.outputs.audio_count }} (${{ steps.scrape.outputs.total_size }})"
+        git commit -m "🎵 $TIME_SLOT scrape: articles $RANGE | +${{ steps.scrape.outputs.new_files }} files | Total: ${{ steps.scrape.outputs.audio_count }} (${{ steps.scrape.outputs.total_size }})"
         git push
         
     - name: Create summary comment (if manual)
       if: github.event_name == 'workflow_dispatch' && steps.changes.outputs.has_changes == 'true'
       run: |
         echo "## 🎯 Manual Scrape Results" >> $GITHUB_STEP_SUMMARY
+        echo "- **Latest article found:** ${{ steps.find_latest.outputs.latest_article }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Range processed:** ${{ steps.scrape.outputs.start_num }}-${{ steps.scrape.outputs.end_num }}" >> $GITHUB_STEP_SUMMARY
         echo "- **New files:** ${{ steps.scrape.outputs.new_files }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Total files:** ${{ steps.scrape.outputs.audio_count }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Dataset size:** ${{ steps.scrape.outputs.total_size }}" >> $GITHUB_STEP_SUMMARY
@@ -185,11 +260,11 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: radio-okapi-12h-${{ github.run_number }}
+        name: radio-okapi-backward-${{ github.run_number }}
         path: |
           ${{ env.OUTPUT_DIR }}/*.mp3
           ${{ env.OUTPUT_DIR }}/manifest.json
           ${{ env.OUTPUT_DIR }}/metadata/
           download_report.md
           logs/
-        retention-days: 7  # Keep for 1 week
+        retention-days: 7
