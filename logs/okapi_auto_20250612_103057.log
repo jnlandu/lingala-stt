@@ -1,0 +1,33 @@
+2025-06-12 10:30:57,568 - INFO - 🔍 Finding valid article range...
+2025-06-12 10:30:57,568 - INFO - 🚀 Starting scrape of articles 183 to 192
+2025-06-12 10:30:57,568 - INFO - 📁 Output directory: data/raw/okapi
+2025-06-12 10:30:57,568 - INFO - 🧵 Using 3 threads
+2025-06-12 10:30:57,568 - INFO - 🔄 Incremental mode: True
+2025-06-12 10:30:57,568 - INFO - 📊 Processing 10 articles
+2025-06-12 10:30:57,907 - INFO - ⬇️  Downloading: 27052025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:30:58,377 - ERROR - ❌ Download failed for 27052025-p-l-journallingalamatin-00.mp3: 404 Client Error: Not Found for url: https://www.radiookapi.net/sites/default/files/2025-05/27052025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:30:58,478 - INFO - ⬇️  Downloading: 28052025-p-l-journallingalamatin-00mp3web.mp3
+2025-06-12 10:30:59,788 - INFO - ✅ Downloaded: 28052025-p-l-journallingalamatin-00mp3web.mp3 (2.6 MB)
+2025-06-12 10:30:59,889 - INFO - ⬇️  Downloading: 3-0052025-p-l-journallingalamatin-00web.mp3
+2025-06-12 10:31:01,125 - INFO - ✅ Downloaded: 3-0052025-p-l-journallingalamatin-00web.mp3 (2.0 MB)
+2025-06-12 10:31:01,226 - INFO - ⬇️  Downloading: 04062025-p-l-journallingalamatin-00mp3web.mp3
+2025-06-12 10:31:02,561 - INFO - ✅ Downloaded: 04062025-p-l-journallingalamatin-00mp3web.mp3 (2.5 MB)
+2025-06-12 10:31:02,662 - INFO - ⬇️  Downloading: 02062025-p-l-journallingalamatin-00web.mp3
+2025-06-12 10:31:03,875 - INFO - ✅ Downloaded: 02062025-p-l-journallingalamatin-00web.mp3 (1.9 MB)
+2025-06-12 10:31:03,976 - INFO - ⬇️  Downloading: 06062025-p-f-journallingalamatin-00mp3web.mp3
+2025-06-12 10:31:05,939 - INFO - ✅ Downloaded: 06062025-p-f-journallingalamatin-00mp3web.mp3 (8.3 MB)
+2025-06-12 10:31:06,040 - INFO - ⬇️  Downloading: 03062025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:31:06,556 - ERROR - ❌ Download failed for 03062025-p-l-journallingalamatin-00.mp3: 404 Client Error: Not Found for url: https://www.radiookapi.net/sites/default/files/2025-06/03062025-p-l-journallingalamatin-00.mp3
+2025-06-12 10:31:06,656 - INFO - ⬇️  Downloading: 09062025-p-l-journallingalamatin-00web.mp3
+2025-06-12 10:31:08,420 - INFO - ✅ Downloaded: 09062025-p-l-journallingalamatin-00web.mp3 (1.8 MB)
+2025-06-12 10:31:08,521 - INFO - ⬇️  Downloading: 10062025-p-l-journallingalamatin-00mp3.mp3
+2025-06-12 10:31:09,990 - INFO - ✅ Downloaded: 10062025-p-l-journallingalamatin-00mp3.mp3 (2.6 MB)
+2025-06-12 10:31:10,090 - INFO - ⬇️  Downloading: 12062025-p-l-journallingalamatin-00web.mp3
+2025-06-12 10:31:11,319 - INFO - ✅ Downloaded: 12062025-p-l-journallingalamatin-00web.mp3 (1.9 MB)
+2025-06-12 10:31:11,320 - INFO - 📈 Progress: 10/10 articles processed
+2025-06-12 10:31:11,422 - INFO - 📋 Generated manifest with 11 files
+2025-06-12 10:31:11,422 - INFO - 🎉 Scraping complete!
+2025-06-12 10:31:11,422 - INFO - ✅ Successful downloads: 8
+2025-06-12 10:31:11,422 - INFO - ❌ Failed downloads: 2
+2025-06-12 10:31:11,422 - INFO - 📁 Total files: 11
+2025-06-12 10:31:11,422 - INFO - 💾 Output directory: data/raw/okapi
