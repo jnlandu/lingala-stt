@@ -276,10 +276,10 @@ graph TD
 
 | Phase | Target | Status |
 |-------|--------|---------|
-| **Q3 2024** | Automated collection setup | ✅ Complete |
-| **Q4 2024** | 50+ articles collected | 🔄 In Progress |
-| **Q1 2025** | Transcription pipeline | 📋 Planned |
-| **Q2 2025** | First model release | 📋 Planned |
+| **Q2 2025** | Automated collection setup | In progress |
+| **Q3 2025** | 50+ articles collected | 🔄 In Progress |
+| **Q4 2025** | Transcription pipeline | 📋 Planned |
+| **Q1 2026** | First model release | 📋 Planned |
 
 ### Collection Projections
 - **Daily**: ~20 articles (via 2x 10-article runs)
