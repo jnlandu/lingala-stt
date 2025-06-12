@@ -1,12 +1,10 @@
-# This workflow scrapes the latest audio files from Radio Okapi, processes them, and uploads them to the repository.
-# The workflow runs weekly on Sundays at 6 AM UTC, but can also be triggered manually.
-
-name: Weekly Radio Okapi Scraper
+name: Radio Okapi Lingala Scraper
 
 on:
-  # Run every Sunday at 6 AM UTC
+  # Run every 12 hours at 6 AM and 6 PM UTC
   schedule:
-    - cron: '0 6 * * 0'
+    - cron: '0 6 * * *'   # 6 AM UTC daily
+    - cron: '0 18 * * *'  # 6 PM UTC daily
   
   # Allow manual triggering
   workflow_dispatch:
@@ -37,10 +35,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        lfs: true  # Enable Git LFS for audio files
+        lfs: true
         
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5  # Updated from v4 to v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         
@@ -63,24 +61,27 @@ jobs:
         mkdir -p ${{ env.OUTPUT_DIR }}/metadata
         mkdir -p logs
         
-    - name: Run scraper
+    - name: Run scraper (every 12 hours - 20 articles)
       id: scrape
       run: |
-        # Set parameters based on input
+        # Use 20 articles by default, or custom input
         ARTICLE_COUNT="${{ github.event.inputs.article_count || '20' }}"
         FORCE_FULL="${{ github.event.inputs.force_full_scan || 'false' }}"
         
+        echo "🚀 Starting 12-hour scrape cycle..."
+        echo "📊 Target articles: $ARTICLE_COUNT"
+        
         if [ "$FORCE_FULL" = "true" ]; then
-          echo "Running full range scan..."
-          python scripts/download_okapi_auto.py \
+          echo "🔄 Running full range scan..."
+          python scripts/download_okapi.py \
             --out "${{ env.OUTPUT_DIR }}" \
             --threads 3 \
             --incremental \
             --metadata \
             --manifest
         else
-          echo "Downloading latest $ARTICLE_COUNT articles..."
-          python scripts/download_okapi_auto.py \
+          echo "📥 Downloading latest $ARTICLE_COUNT articles..."
+          python scripts/download_okapi.py \
             --out "${{ env.OUTPUT_DIR }}" \
             --latest "$ARTICLE_COUNT" \
             --threads 3 \
@@ -98,67 +99,90 @@ jobs:
         echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
         echo "new_files=$NEW_FILES" >> $GITHUB_OUTPUT
         
+        echo "✅ Scrape completed!"
+        echo "📊 Total files: $AUDIO_COUNT"
+        echo "🆕 New files: $NEW_FILES"
+        echo "💾 Dataset size: $TOTAL_SIZE"
+        
     - name: Generate download report
       run: |
-        echo "# 📻 Radio Okapi Weekly Download Report" > download_report.md
+        TIMESTAMP=$(date -u)
+        RUN_TYPE="Scheduled (every 12 hours)"
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          RUN_TYPE="Manual trigger"
+        fi
+        
+        echo "# 📻 Radio Okapi Download Report" > download_report.md
         echo "" >> download_report.md
-        echo "**Date:** $(date -u)" >> download_report.md
-        echo "**New files:** ${{ steps.scrape.outputs.new_files }}" >> download_report.md
+        echo "**Run type:** $RUN_TYPE" >> download_report.md
+        echo "**Timestamp:** $TIMESTAMP" >> download_report.md
+        echo "**New files this run:** ${{ steps.scrape.outputs.new_files }}" >> download_report.md
         echo "**Total audio files:** ${{ steps.scrape.outputs.audio_count }}" >> download_report.md
         echo "**Total dataset size:** ${{ steps.scrape.outputs.total_size }}" >> download_report.md
         echo "" >> download_report.md
         
         echo "## 🆕 Latest Downloads" >> download_report.md
-        find ${{ env.OUTPUT_DIR }} -name "*.mp3" -mtime -1 -exec basename {} \; | head -10 >> download_report.md
+        if [ "${{ steps.scrape.outputs.new_files }}" -gt 0 ]; then
+          find ${{ env.OUTPUT_DIR }} -name "*.mp3" -mtime -1 -exec basename {} \; | head -10 >> download_report.md
+        else
+          echo "No new files downloaded (all articles already processed)" >> download_report.md
+        fi
         
         echo "" >> download_report.md
-        echo "## 📊 Dataset Statistics" >> download_report.md
-        echo "- Language: Lingala (ln)" >> download_report.md
-        echo "- Source: Radio Okapi" >> download_report.md
-        echo "- Format: MP3" >> download_report.md
-        echo "- Use case: Speech-to-Text training" >> download_report.md
+        echo "## ⏰ Schedule" >> download_report.md
+        echo "- Runs every 12 hours (6 AM & 6 PM UTC)" >> download_report.md
+        echo "- Downloads latest 20 articles per run" >> download_report.md
+        echo "- Uses incremental mode (skips existing files)" >> download_report.md
         
-    - name: Check for new files
+    - name: Check for changes
       id: changes
       run: |
         git add .
         if git diff --staged --quiet; then
           echo "has_changes=false" >> $GITHUB_OUTPUT
-          echo "No new files to commit"
+          echo "ℹ️ No new files to commit"
         else
           echo "has_changes=true" >> $GITHUB_OUTPUT
-          echo "New files found: ${{ steps.scrape.outputs.new_files }}"
+          echo "✅ New files found: ${{ steps.scrape.outputs.new_files }}"
         fi
         
     - name: Commit and push changes
       if: steps.changes.outputs.has_changes == 'true'
       run: |
         git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action Bot"
+        git config --local user.name "GitHub Action - 12h Scraper"
+        
+        # Determine commit message based on time
+        HOUR=$(date -u +%H)
+        if [ "$HOUR" -ge 6 ] && [ "$HOUR" -lt 18 ]; then
+          TIME_SLOT="Morning"
+        else
+          TIME_SLOT="Evening"
+        fi
         
         git add .
-        git commit -m "🎵 Weekly scrape: +${{ steps.scrape.outputs.new_files }} files (Total: ${{ steps.scrape.outputs.audio_count }})"
+        git commit -m "🎵 $TIME_SLOT scrape: +${{ steps.scrape.outputs.new_files }} files | Total: ${{ steps.scrape.outputs.audio_count }} (${{ steps.scrape.outputs.total_size }})"
         git push
         
-    - name: Create release for new files
-      if: steps.changes.outputs.has_changes == 'true' && steps.scrape.outputs.new_files > 0
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: weekly-${{ github.run_number }}
-        name: "📻 Weekly Okapi Audio - ${{ github.run_number }}"
-        body_path: download_report.md
-        files: |
-          ${{ env.OUTPUT_DIR }}/manifest.json
+    - name: Create summary comment (if manual)
+      if: github.event_name == 'workflow_dispatch' && steps.changes.outputs.has_changes == 'true'
+      run: |
+        echo "## 🎯 Manual Scrape Results" >> $GITHUB_STEP_SUMMARY
+        echo "- **New files:** ${{ steps.scrape.outputs.new_files }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Total files:** ${{ steps.scrape.outputs.audio_count }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Dataset size:** ${{ steps.scrape.outputs.total_size }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Files committed to repository" >> $GITHUB_STEP_SUMMARY
         
     - name: Upload artifacts
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # 🔥 FIXED: Updated from v3 to v4
       with:
-        name: radio-okapi-weekly-${{ github.run_number }}
+        name: radio-okapi-12h-${{ github.run_number }}
         path: |
           ${{ env.OUTPUT_DIR }}/*.mp3
           ${{ env.OUTPUT_DIR }}/manifest.json
           ${{ env.OUTPUT_DIR }}/metadata/
           download_report.md
           logs/
-        retention-days: 30
+        retention-days: 7  # Keep for 1 week
