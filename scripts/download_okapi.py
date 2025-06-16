@@ -157,7 +157,7 @@ def find_article_range(start_num: int = None, end_num: int = None) -> tuple:
     current_num = 1  # Start from a reasonable number
     
     # Find the highest available article
-    while current_num < 10:  # Safety limit
+    while current_num < 20:  # Safety limit
         result = fetch_mp3_from_article(current_num)
         if result.get('error') == '404 Not Found':
             break
@@ -165,7 +165,7 @@ def find_article_range(start_num: int = None, end_num: int = None) -> tuple:
         time.sleep(0.1)  # Small delay
     
     max_num = current_num - 1
-    min_num = max(1, max_num - 5)  # Get last 5 articles
+    min_num = max(1, max_num - 10)  # Get last 5 articles
     
     logger.info(f"📊 Found article range: {min_num} to {max_num}")
     return min_num, max_num
