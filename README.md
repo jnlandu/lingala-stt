@@ -1,8 +1,8 @@
 # Lingala Speech-to-Text Corpus (Lingala-STT)
 
-A community-driven effort to create, curate, and openly publish a high-quality Lingala speech corpus for automatic speech recognition (ASR) research and products.
+An effort to create, curate, and openly publish a high-quality Lingala speech corpus for automatic speech recognition (ASR) research and products.
 
-**🚀 Now with automated data collection!** GitHub Actions automatically downloads new Radio Okapi audio every 12 hours.
+**Now with automated data collection!** GitHub Actions automatically downloads new Radio Okapi audio every 12 hours.
 
 [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/jnlandu/lingala-stt/radio_okapi_daily.yml?label=Auto%20Collection)](https://github.com/jnlandu/lingala-stt/actions)
 [![Dataset Size](https://img.shields.io/badge/Dataset-Growing%20Daily-brightgreen)]()
@@ -10,7 +10,7 @@ A community-driven effort to create, curate, and openly publish a high-quality L
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 lingala-stt/
@@ -37,7 +37,7 @@ lingala-stt/
 └── top-congo/               ← additional dataset sources
 ```
 
-## 🎵 Audio Sources
+## Audio Sources
 
 ### Automated Collection (Primary Source)
 - **🤖 Radio Okapi**: Daily Lingala news bulletins automatically collected
@@ -54,7 +54,7 @@ lingala-stt/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Option 1: Use Pre-collected Data (Recommended)
 ```bash
@@ -72,12 +72,6 @@ cat data/raw/okapi/manifest.json | jq '.[] | {filename, title, date}'
 python scripts/segment.py data/raw/okapi/ \
                           --out_dir data/interim/okapi \
                           --batch_mode
-
-# 4. Auto-align with Whisper
-python scripts/align_whisper.py data/interim/okapi/
-
-# 5. Export HF-ready dataset
-python scripts/export_hf.py --repo jeremie/lingala-stt-dev
 ```
 
 ### Option 2: Download Fresh Audio
@@ -107,7 +101,7 @@ python scripts/download_okapi.py \
 
 ---
 
-## 🤖 Automated Data Collection
+## Automated Data Collection
 
 ### GitHub Actions Workflows
 
@@ -123,7 +117,7 @@ python scripts/download_okapi.py \
    - Safer approach, avoids 404 errors
 
 ### Current Collection Status
-Based on your manifest, the system has successfully collected:
+The system has successfully collected:
 - **Articles 1-6**: January 2023 broadcasts
 - **Recent files**: June 2025 broadcasts  
 - **Total**: ~8 audio files (Growing automatically)
@@ -131,7 +125,7 @@ Based on your manifest, the system has successfully collected:
 ### Manual Trigger
 Trigger collection manually via GitHub Actions:
 
-1. Go to **Actions** tab in your repository
+1. Go to **Actions** tab in the  repository
 2. Select **"Radio Okapi Daily Lingala Scraper"** 
 3. Click **"Run workflow"**
 4. Configure parameters:
@@ -151,10 +145,9 @@ python scripts/schedule_okapi.py --interval daily
 # Run with custom interval
 python scripts/schedule_okapi.py --interval hourly
 ```
-
 ---
 
-## 📊 Dataset Statistics
+##  Dataset Statistics
 
 | Metric | Current Value | Auto-Updated |
 |--------|---------------|--------------|
@@ -211,7 +204,7 @@ act workflow_dispatch -j scrape-okapi --input article_count=2
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 ### Data Contribution
 1. **Automated**: GitHub Actions handles Radio Okapi collection
@@ -232,19 +225,12 @@ The current approach focuses on **historical articles** working backwards from t
 
 ---
 
-## 📜 License
+## License
 
 ```
 Creative Commons Attribution 4.0 International
 <https://creativecommons.org/licenses/by/4.0/>
 ```
-
-**Automated collection** respects Radio Okapi's terms of service with:
-- Rate limiting between requests
-- Respectful crawling patterns
-- Proper user agent identification
-
----
 
 ## 🔄 How Automation Works
 
@@ -282,29 +268,12 @@ graph TD
 | **Q1 2026** | First model release | 📋 Planned |
 
 ### Collection Projections
-- **Daily**: ~20 articles (via 2x 10-article runs)
-- **Weekly**: ~140 articles  
-- **Monthly**: ~600 articles
+- **Daily**: ~2 articles (via 2x 10-article runs)
+- **Weekly**: ~14 articles  
+- **Monthly**: ~56 articles
 - **Goal**: Build comprehensive historical archive
 
 ---
-
-## 🔍 Troubleshooting
-
-### Common Issues
-```bash
-# Check workflow status
-cat .github/workflows/radio_okapi_daily.yml
-
-# Verify downloads
-ls -la data/raw/okapi/*.mp3
-
-# Check logs for errors
-grep -i error logs/okapi_auto_*.log
-
-# Test single article
-python scripts/download_okapi.py --start 5 --end 5 --out data/test
-```
 
 ### 404 Errors
 The new **backward collection strategy** eliminates 404 errors by:
@@ -319,22 +288,18 @@ git lfs ls-files
 
 # Dataset size
 du -sh data/raw/okapi/
-
-# Clean up test files
-rm -rf data/test/
 ```
 
+
 ---
 
-## 📞 Support
-
+## Support
 - **Issues**: Use GitHub Issues for bug reports
 - **Discussions**: GitHub Discussions for questions
-- **Community**: Join Masakhane Discord `#lingala-asr`
-
+- **Contributions**: PRs welcome, see [CONTRIBUTING.md](CONTRIBUTING.md)
 ---
 
-*Maintained by @jeremie-nlandu and the Lingala-STT community.*  
+*Maintained by @jnlandu.*  
 *For automation questions, check the Actions tab or create an issue tagged `automation`.*
 
-**🎯 Goal**: Build the largest open-source Lingala speech corpus for advancing ASR technology in Central Africa.
+** Goal**: Build the largest open-source Lingala speech corpus for advancing ASR technology in Central Africa.
