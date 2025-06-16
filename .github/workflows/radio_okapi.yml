@@ -70,7 +70,7 @@ jobs:
       id: scrape
       run: |
         # Use 20 articles by default, or custom input
-        ARTICLE_COUNT="${{ github.event.inputs.article_count || '2' }}"
+        ARTICLE_COUNT="${{ github.event.inputs.article_count || '5' }}"
         FORCE_FULL="${{ github.event.inputs.force_full_scan || 'false' }}"
         
         echo "🚀 Starting 12-hour scrape cycle..."
