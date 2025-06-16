@@ -1,0 +1,14 @@
+2025-06-16 06:32:11,379 - INFO - 🔍 Finding valid article range...
+2025-06-16 06:32:11,379 - INFO - 🚀 Starting scrape of articles 185 to 194
+2025-06-16 06:32:11,379 - INFO - 📁 Output directory: data/raw/okapi
+2025-06-16 06:32:11,379 - INFO - 🧵 Using 3 threads
+2025-06-16 06:32:11,379 - INFO - 🔄 Incremental mode: True
+2025-06-16 06:32:11,379 - INFO - 📊 Processing 1 articles
+2025-06-16 06:32:11,872 - INFO - ⬇️  Downloading: 16062025-p-l-journallingalamatin-00web.mp3
+2025-06-16 06:32:12,307 - INFO - ✅ Downloaded: 16062025-p-l-journallingalamatin-00web.mp3 (2.0 MB)
+2025-06-16 06:32:12,410 - INFO - 📋 Generated manifest with 13 files
+2025-06-16 06:32:12,410 - INFO - 🎉 Scraping complete!
+2025-06-16 06:32:12,410 - INFO - ✅ Successful downloads: 1
+2025-06-16 06:32:12,410 - INFO - ❌ Failed downloads: 0
+2025-06-16 06:32:12,410 - INFO - 📁 Total files: 13
+2025-06-16 06:32:12,410 - INFO - 💾 Output directory: data/raw/okapi
