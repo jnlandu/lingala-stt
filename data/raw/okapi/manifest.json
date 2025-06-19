@@ -192,6 +192,18 @@
     "needs_transcription": true
   },
   {
+    "audio_path": "raw/okapi/200625-p-l-journallingalamatin-00web.mp3",
+    "filename": "200625-p-l-journallingalamatin-00web.mp3",
+    "title": "Journal Lingala Matin | Radio Okapi",
+    "article_number": 198,
+    "date": null,
+    "source": "radio_okapi",
+    "source_url": "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-198",
+    "file_size": 1955664,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
     "audio_path": "raw/okapi/10022023-p-l-journallingalamatin-web.mp3",
     "filename": "10022023-p-l-journallingalamatin-web.mp3",
     "title": "Journal Lingala Matin | Radio Okapi",
