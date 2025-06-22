@@ -1,0 +1,14 @@
+2025-06-22 18:15:49,190 - INFO - 🔍 Finding valid article range...
+2025-06-22 18:15:49,190 - INFO - 🚀 Starting scrape of articles 190 to 199
+2025-06-22 18:15:49,190 - INFO - 📁 Output directory: data/raw/okapi
+2025-06-22 18:15:49,190 - INFO - 🧵 Using 3 threads
+2025-06-22 18:15:49,190 - INFO - 🔄 Incremental mode: True
+2025-06-22 18:15:49,190 - INFO - 📊 Processing 1 articles
+2025-06-22 18:15:49,750 - INFO - ⬇️  Downloading: 23062025-p-l-journallingala_matin-00web.mp3
+2025-06-22 18:15:51,077 - INFO - ✅ Downloaded: 23062025-p-l-journallingala_matin-00web.mp3 (1.9 MB)
+2025-06-22 18:15:51,180 - INFO - 📋 Generated manifest with 27 files
+2025-06-22 18:15:51,181 - INFO - 🎉 Scraping complete!
+2025-06-22 18:15:51,181 - INFO - ✅ Successful downloads: 1
+2025-06-22 18:15:51,181 - INFO - ❌ Failed downloads: 0
+2025-06-22 18:15:51,181 - INFO - 📁 Total files: 27
+2025-06-22 18:15:51,181 - INFO - 💾 Output directory: data/raw/okapi

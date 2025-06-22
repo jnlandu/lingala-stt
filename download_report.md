@@ -1,12 +1,12 @@
 # 📻 Radio Okapi Download Report
 
 **Run type:** Scheduled (every 12 hours - backward crawl)
-**Timestamp:** Sun Jun 22 06:28:17 UTC 2025
-**Latest article found:** 198
-**Articles processed:** 189-198
-**New files this run:** 26
-**Total audio files:** 26
-**Total dataset size:** 58M
+**Timestamp:** Sun Jun 22 18:15:51 UTC 2025
+**Latest article found:** 199
+**Articles processed:** 190-199
+**New files this run:** 27
+**Total audio files:** 27
+**Total dataset size:** 60M
 
 ## 🆕 Latest Downloads
 12062025-p-l-journallingalamatin-00web.mp3

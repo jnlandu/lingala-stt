@@ -180,6 +180,18 @@
     "needs_transcription": true
   },
   {
+    "audio_path": "raw/okapi/23062025-p-l-journallingala_matin-00web.mp3",
+    "filename": "23062025-p-l-journallingala_matin-00web.mp3",
+    "title": "Journal Lingala Matin | Radio Okapi",
+    "article_number": 199,
+    "date": "23/06/2025",
+    "source": "radio_okapi",
+    "source_url": "https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-199",
+    "file_size": 1966176,
+    "language": "ln",
+    "needs_transcription": true
+  },
+  {
     "audio_path": "raw/okapi/03022023-p-l-journallingalamatin-web.mp3",
     "filename": "03022023-p-l-journallingalamatin-web.mp3",
     "title": "Journal Lingala Matin | Radio Okapi",
