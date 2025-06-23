@@ -111,22 +111,18 @@ jobs:
 
     #  ------------ Donwload to gdrive  jeremy@aimsammi.org -------------------
     - name: Setup Google Drive credentials
-      if: steps.commit_check.outputs.changes_made == 'true'
       run: |
         echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT }}' > service-account.json
 
     - name: Install Google Drive dependencies
-      if: steps.commit_check.outputs.changes_made == 'true'
       run: |
         pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
     - name: Upload to Google Drive
-      if: steps.commit_check.outputs.changes_made == 'true'
       run: |
         python scripts/upload_to_gdrive.py
 
     - name: Add Google Drive info to summary
-      if: steps.commit_check.outputs.changes_made == 'true'
       run: |
         if [ -f upload_summary.txt ]; then
           source upload_summary.txt
