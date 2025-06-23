@@ -1,0 +1,226 @@
+name: Radio Okapi Daily  Lingala Scraper after 12 Hours
+description: |
+  Scrapes the latest articles from Radio Okapi in Lingala every 12 hours, downloading audio files and metadata.
+  Supports manual triggering with options for custom article count and full range scans.
+# This workflow runs every 12 hours to scrape the latest articles from Radio Okapi in Lingala.
+# It downloads audio files, metadata, and generates a report.
+# The workflow can also be manually triggered with options for custom article count and full range scans.
+
+on:
+  # Run every 12 hours at 6 AM and 6 PM UTC
+  schedule:
+    - cron: '0 5 * * *'   # 5 AM UTC daily
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      article_count:
+        description: 'Number of latest articles to download'
+        required: false
+        default: '10'
+        type: string
+      force_full_scan:
+        description: 'Force full range scan instead of latest'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  OUTPUT_DIR: 'data/raw/okapi'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  scrape-okapi:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        lfs: true
+        
+    - name: Set up Python
+      uses: actions/setup-python@v5  # Updated from v4 to v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4 lxml
+        
+    - name: Setup Git LFS for audio files
+      run: |
+        git lfs install
+        if [ ! -f .gitattributes ] || ! grep -q "*.mp3" .gitattributes; then
+          echo "*.mp3 filter=lfs diff=lfs merge=lfs -text" >> .gitattributes
+          git add .gitattributes
+        fi
+        
+    - name: Create output directories
+      run: |
+        mkdir -p ${{ env.OUTPUT_DIR }}
+        mkdir -p ${{ env.OUTPUT_DIR }}/metadata
+        mkdir -p logs
+        
+    - name: Run scraper (every 12 hours - 20 articles)
+      id: scrape
+      run: |
+        # Use 20 articles by default, or custom input
+        ARTICLE_COUNT="${{ github.event.inputs.article_count || '10' }}"
+        FORCE_FULL="${{ github.event.inputs.force_full_scan || 'false' }}"
+        
+        echo "🚀 Starting 12-hour scrape cycle..."
+        echo "📊 Target articles: $ARTICLE_COUNT"
+        
+        if [ "$FORCE_FULL" = "true" ]; then
+          echo "🔄 Running full range scan..."
+          python scripts/download_okapi.py \
+            --out "${{ env.OUTPUT_DIR }}" \
+            --threads 3 \
+            --incremental \
+            --metadata \
+            --manifest
+        else
+          echo "📥 Downloading latest $ARTICLE_COUNT articles..."
+          python scripts/download_okapi.py \
+            --out "${{ env.OUTPUT_DIR }}" \
+            --latest "$ARTICLE_COUNT" \
+            --threads 3 \
+            --incremental \
+            --metadata \
+            --manifest
+        fi
+        
+        # Get statistics
+        AUDIO_COUNT=$(find ${{ env.OUTPUT_DIR }} -name "*.mp3" | wc -l)
+        TOTAL_SIZE=$(du -sh ${{ env.OUTPUT_DIR }} | cut -f1)
+        NEW_FILES=$(find ${{ env.OUTPUT_DIR }} -name "*.mp3" -mtime -1 | wc -l)
+        
+        echo "audio_count=$AUDIO_COUNT" >> $GITHUB_OUTPUT
+        echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+        echo "new_files=$NEW_FILES" >> $GITHUB_OUTPUT
+        
+        echo "✅ Scrape completed!"
+        echo "📊 Total files: $AUDIO_COUNT"
+        echo "🆕 New files: $NEW_FILES"
+        echo "💾 Dataset size: $TOTAL_SIZE"
+
+    #  ------------ Donwload to gdrive  jeremy@aimsammi.org -------------------
+    - name: Setup Google Drive credentials
+      if: steps.commit_check.outputs.changes_made == 'true'
+      run: |
+        echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT }}' > service-account.json
+
+    - name: Install Google Drive dependencies
+      if: steps.commit_check.outputs.changes_made == 'true'
+      run: |
+        pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+    - name: Upload to Google Drive
+      if: steps.commit_check.outputs.changes_made == 'true'
+      run: |
+        python scripts/upload_to_gdrive.py
+
+    - name: Add Google Drive info to summary
+      if: steps.commit_check.outputs.changes_made == 'true'
+      run: |
+        if [ -f upload_summary.txt ]; then
+          source upload_summary.txt
+          echo "## 📤 Google Drive Backup" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files uploaded:** $uploaded" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files skipped:** $skipped" >> $GITHUB_STEP_SUMMARY
+          echo "- **Drive folder:** [View folder](https://drive.google.com/drive/folders/$folder_id)" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Cleanup credentials
+      if: always()
+      run: |
+        rm -f service-account.json
+
+     # ---------------- end download to gdrive -------------------
+    - name: Generate download report
+      run: |
+        TIMESTAMP=$(date -u)
+        RUN_TYPE="Scheduled (every 12 hours)"
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          RUN_TYPE="Manual trigger"
+        fi
+        
+        echo "# 📻 Radio Okapi Download Report" > download_report.md
+        echo "" >> download_report.md
+        echo "**Run type:** $RUN_TYPE" >> download_report.md
+        echo "**Timestamp:** $TIMESTAMP" >> download_report.md
+        echo "**New files this run:** ${{ steps.scrape.outputs.new_files }}" >> download_report.md
+        echo "**Total audio files:** ${{ steps.scrape.outputs.audio_count }}" >> download_report.md
+        echo "**Total dataset size:** ${{ steps.scrape.outputs.total_size }}" >> download_report.md
+        echo "" >> download_report.md
+        
+        echo "## 🆕 Latest Downloads" >> download_report.md
+        if [ "${{ steps.scrape.outputs.new_files }}" -gt 0 ]; then
+          find ${{ env.OUTPUT_DIR }} -name "*.mp3" -mtime -1 -exec basename {} \; | head -10 >> download_report.md
+        else
+          echo "No new files downloaded (all articles already processed)" >> download_report.md
+        fi
+        
+        echo "" >> download_report.md
+        echo "## ⏰ Schedule" >> download_report.md
+        echo "- Runs every 12 hours (6 AM & 6 PM UTC)" >> download_report.md
+        echo "- Downloads latest 20 articles per run" >> download_report.md
+        echo "- Uses incremental mode (skips existing files)" >> download_report.md
+        
+    - name: Check for changes
+      id: changes
+      run: |
+        git add .
+        if git diff --staged --quiet; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ No new files to commit"
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "✅ New files found: ${{ steps.scrape.outputs.new_files }}"
+        fi
+        
+    - name: Commit and push changes
+      if: steps.changes.outputs.has_changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action - 12h Scraper"
+        
+        # Determine commit message based on time
+        HOUR=$(date -u +%H)
+        if [ "$HOUR" -ge 6 ] && [ "$HOUR" -lt 18 ]; then
+          TIME_SLOT="Morning"
+        else
+          TIME_SLOT="Evening"
+        fi
+        
+        git add .
+        git commit -m "🎵 $TIME_SLOT scrape: +${{ steps.scrape.outputs.new_files }} files | Total: ${{ steps.scrape.outputs.audio_count }} (${{ steps.scrape.outputs.total_size }})"
+        git push
+        
+    - name: Create summary comment (if manual)
+      if: github.event_name == 'workflow_dispatch' && steps.changes.outputs.has_changes == 'true'
+      run: |
+        echo "## 🎯 Manual Scrape Results" >> $GITHUB_STEP_SUMMARY
+        echo "- **New files:** ${{ steps.scrape.outputs.new_files }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Total files:** ${{ steps.scrape.outputs.audio_count }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Dataset size:** ${{ steps.scrape.outputs.total_size }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Files committed to repository" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v4  # 🔥 FIXED: Updated from v3 to v4
+      with:
+        name: radio-okapi-12h-${{ github.run_number }}
+        path: |
+          ${{ env.OUTPUT_DIR }}/*.mp3
+          ${{ env.OUTPUT_DIR }}/manifest.json
+          ${{ env.OUTPUT_DIR }}/metadata/
+          download_report.md
+          logs/
+        retention-days: 7  # Keep for 1 week
