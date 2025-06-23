@@ -1,4 +1,4 @@
-name: Radio Okapi Daily  Lingala Scraper after 12 Hours
+name: Radio Okapi Daily  Lingala Scraper to Google Drive
 description: |
   Scrapes the latest articles from Radio Okapi in Lingala every 12 hours, downloading audio files and metadata.
   Supports manual triggering with options for custom article count and full range scans.
