@@ -36,9 +36,21 @@ def file_exists_in_drive(service, filename, parent_id):
 
 def upload_to_gdrive():
     try:
-        # Load credentials
-        credentials = service_account.Credentials.from_service_account_file(
-            'service-account.json',
+        # Load credentials from JSON string
+        credentials_json = os.environ.get('GOOGLE_SERVICE_ACCOUNT')
+        if not credentials_json:
+            raise ValueError("GOOGLE_SERVICE_ACCOUNT environment variable not set")
+        
+        # Parse JSON and create credentials
+        try:
+            credentials_info = json.loads(credentials_json)
+        except json.JSONDecodeError as e:
+            print(f"❌ Invalid JSON in credentials: {e}")
+            print(f"First 100 chars of credentials: {credentials_json[:100]}")
+            raise
+        
+        credentials = service_account.Credentials.from_service_account_info(
+            credentials_info,
             scopes=['https://www.googleapis.com/auth/drive.file']
         )
         
