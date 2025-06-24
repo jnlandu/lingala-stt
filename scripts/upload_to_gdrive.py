@@ -34,6 +34,25 @@ def file_exists_in_drive(service, filename, parent_id):
     results = service.files().list(q=query).execute()
     return len(results.get('files', [])) > 0
 
+
+
+def share_folder_with_user(service, folder_id, user_email):
+    """Share folder with a specific user"""
+    try:
+        permission = {
+            'type': 'user',
+            'role': 'writer',
+            'emailAddress': user_email
+        }
+        service.permissions().create(
+            fileId=folder_id,
+            body=permission,
+            fields='id'
+        ).execute()
+        print(f"✅ Shared folder with {user_email}")
+    except Exception as e:
+        print(f"⚠️  Could not share folder: {e}")
+
 def upload_to_gdrive():
     try:
         # Load credentials from JSON string
@@ -61,6 +80,11 @@ def upload_to_gdrive():
         audio_folder_id = get_or_create_folder(service, 'audio', main_folder_id)
         metadata_folder_id = get_or_create_folder(service, 'metadata', main_folder_id)
         
+        # Share the main folder with your personal email
+        personal_email = os.environ.get('PERSONAL_EMAIL')
+        if personal_email:
+            share_folder_with_user(service, main_folder_id, personal_email)
+            
         uploaded_count = 0
         skipped_count = 0
         

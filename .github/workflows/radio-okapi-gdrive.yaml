@@ -119,6 +119,9 @@ jobs:
         pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
     - name: Upload to Google Drive
+      env:
+        GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+        PERSONAL_EMAIL: ${{ secrets.PERSONAL_EMAIL }}
       run: |
         python scripts/upload_to_gdrive.py
 
