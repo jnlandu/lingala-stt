@@ -1,0 +1,14 @@
+2025-06-24 18:17:47,637 - INFO - 🔍 Finding valid article range...
+2025-06-24 18:17:47,637 - INFO - 🚀 Starting scrape of articles 191 to 200
+2025-06-24 18:17:47,637 - INFO - 📁 Output directory: data/raw/okapi
+2025-06-24 18:17:47,637 - INFO - 🧵 Using 3 threads
+2025-06-24 18:17:47,637 - INFO - 🔄 Incremental mode: True
+2025-06-24 18:17:47,637 - INFO - 📊 Processing 1 articles
+2025-06-24 18:17:48,217 - INFO - ⬇️  Downloading: 24062025-p-l-journallingalamatin-00.mp3
+2025-06-24 18:17:48,846 - ERROR - ❌ Download failed for 24062025-p-l-journallingalamatin-00.mp3: 404 Client Error: Not Found for url: https://www.radiookapi.net/sites/default/files/2025-06/24062025-p-l-journallingalamatin-00.mp3
+2025-06-24 18:17:48,950 - INFO - 📋 Generated manifest with 27 files
+2025-06-24 18:17:48,950 - INFO - 🎉 Scraping complete!
+2025-06-24 18:17:48,950 - INFO - ✅ Successful downloads: 0
+2025-06-24 18:17:48,950 - INFO - ❌ Failed downloads: 1
+2025-06-24 18:17:48,950 - INFO - 📁 Total files: 27
+2025-06-24 18:17:48,950 - INFO - 💾 Output directory: data/raw/okapi
