@@ -1,7 +1,7 @@
 # 📻 Radio Okapi Download Report
 
-**Run type:** Manual trigger
-**Timestamp:** Tue Jun 24 23:36:27 UTC 2025
+**Run type:** Scheduled (every 12 hours)
+**Timestamp:** Wed Jun 25 05:21:35 UTC 2025
 **New files this run:** 27
 **Total audio files:** 27
 **Total dataset size:** 60M
