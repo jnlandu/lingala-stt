@@ -182,24 +182,62 @@ jobs:
           echo "has_changes=true" >> $GITHUB_OUTPUT
           echo "✅ New files found: ${{ steps.scrape.outputs.new_files }}"
         fi
+  
         
-    - name: Commit and push changes
-      if: steps.changes.outputs.has_changes == 'true'
+    # - name: Commit and push changes
+    #   if: steps.changes.outputs.has_changes == 'true'
+    #   run: |
+    #     git config --local user.email "action@github.com"
+    #     git config --local user.name "GitHub Action - 12h Scraper"
+        
+    #     # Determine commit message based on time
+    #     HOUR=$(date -u +%H)
+    #     if [ "$HOUR" -ge 6 ] && [ "$HOUR" -lt 18 ]; then
+    #       TIME_SLOT="Morning"
+    #     else
+    #       TIME_SLOT="Evening"
+    #     fi
+        
+    #     git add .
+    #     git commit -m "🎵 $TIME_SLOT scrape: +${{ steps.scrape.outputs.new_files }} files | Total: ${{ steps.scrape.outputs.audio_count }} (${{ steps.scrape.outputs.total_size }})"
+    #     git push
+  
+    - name: Commit changes
       run: |
         git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action - 12h Scraper"
+        git config --local user.name "GitHub Action"
+        git add -A
         
-        # Determine commit message based on time
-        HOUR=$(date -u +%H)
-        if [ "$HOUR" -ge 6 ] && [ "$HOUR" -lt 18 ]; then
-          TIME_SLOT="Morning"
+        # Get time of day
+        HOUR=$(date +%H)
+        if [ $HOUR -lt 12 ]; then
+          TIME="Morning"
         else
-          TIME_SLOT="Evening"
+          TIME="Evening"
         fi
         
-        git add .
-        git commit -m "🎵 $TIME_SLOT scrape: +${{ steps.scrape.outputs.new_files }} files | Total: ${{ steps.scrape.outputs.audio_count }} (${{ steps.scrape.outputs.total_size }})"
-        git push
+        # Count all files
+        TOTAL_FILES=$(find data/raw/okapi -name "*.mp3" | wc -l)
+        
+        # Count files added this run
+        NEW_FILES=$(git diff --cached --numstat | wc -l)
+        
+        # Get total size
+        TOTAL_SIZE=$(du -sh data/raw/okapi | awk '{print $1}')
+        
+        git commit -m "🎵 $TIME scrape: +$NEW_FILES files | Total: $TOTAL_FILES ($TOTAL_SIZE)"
+
+    - name: Pull before pushing
+      run: |
+        # Pull with rebase to incorporate remote changes
+        git pull --rebase origin main
+
+    - name: Push changes
+
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
         
     - name: Create summary comment (if manual)
       if: github.event_name == 'workflow_dispatch' && steps.changes.outputs.has_changes == 'true'
