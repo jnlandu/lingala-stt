@@ -1,7 +1,7 @@
 # 📻 Radio Okapi Download Report
 
 **Run type:** Scheduled (every 12 hours - backward crawl)
-**Timestamp:** Sun Jun 29 06:28:58 UTC 2025
+**Timestamp:** Sun Jun 29 18:16:19 UTC 2025
 **Latest article found:** 200
 **Articles processed:** 191-200
 **New files this run:** 27
