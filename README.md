@@ -1,8 +1,8 @@
-# Lingala Speech-to-Text Corpus (Lingala-STT)
+# Central African Languages Speech Corpus
 
 An effort to create, curate, and openly publish a high-quality Lingala speech corpus for automatic speech recognition (ASR) research and products.
 
-**Now with automated data collection!** GitHub Actions automatically downloads new Radio Okapi audio every 12 hours.
+**Now with automated data collection!** GitHub Actions automatically downloads new Radio Okapi audio every 12 hours across multiple Congolese languages and stores them to Google Drive.
 
 [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/jnlandu/lingala-stt/radio_okapi_daily.yml?label=Auto%20Collection)](https://github.com/jnlandu/lingala-stt/actions)
 [![Dataset Size](https://img.shields.io/badge/Dataset-Growing%20Daily-brightgreen)]()
@@ -21,11 +21,18 @@ lingala-stt/
 ├── data/
 │   └── raw/
 │       └── okapi/           ← automated Radio Okapi downloads
-│           ├── *.mp3        ← daily audio bulletins
-│           ├── metadata/    ← article info, dates, URLs
-│           └── manifest.json ← dataset catalog
+│           ├── lingala/     ← Lingala audio bulletins
+│           │   ├── *.mp3
+│           │   └── metadata/
+│           ├── kikongo/     ← Kikongo audio bulletins
+│           │   ├── *.mp3
+│           │   └── metadata/
+│           ├── tshiluba/    ← Tshiluba audio bulletins
+│           │   ├── *.mp3
+│           │   └── metadata/
+│           └── manifest.json ← multi-language dataset catalog
 ├── scripts/
-│   ├── download_okapi.py    ← automated Radio Okapi scraper
+│   ├── download_okapi.py    ← automated Radio Okapi scraper (multi-language)
 │   ├── schedule_okapi.py    ← local scheduling script
 │   ├── align_whisper.py     ← auto-transcribe + forced alignment
 │   └── segment.py           ← silence-based segmentation
@@ -40,12 +47,16 @@ lingala-stt/
 ## Audio Sources
 
 ### Automated Collection (Primary Source)
-- **🤖 Radio Okapi**: Daily Lingala news bulletins automatically collected
-  - Source: `https://www.radiookapi.net/journal-journal-lingala/`
+### Automated Collection (Primary Source)
+- **🤖 Radio Okapi**: Daily news bulletins automatically collected in multiple languages and stored to Google Drive
+  - **Lingala**: `https://www.radiookapi.net/journal-journal-lingala/`
+  - **Kikongo**: `https://www.radiookapi.net/journal-journal-kikongo/`
+  - **Tshiluba**: `https://www.radiookapi.net/journal-journal-tshiluba/`
   - Format: MP3, 1–15 min segments
   - Schedule: Every 12 hours (6 AM & 6 PM UTC)
-  - Language: Professional Lingala news broadcasts from DRC
-  - **Current Status**: Articles 1-6 collected, growing backwards from latest available
+  - Language: Professional broadcasts from DRC
+  - **Storage**: Automatically synced to Google Drive
+  - **Current Status**: Articles 1-6 collected per language, growing backwards from latest available
 
 ### Manual Collection Sources
 - **Field recordings**: Spontaneous conversations from various DRC regions
@@ -55,7 +66,6 @@ lingala-stt/
 ---
 
 ## Quick Start
-
 ### Option 1: Use Pre-collected Data (Recommended)
 ```bash
 # 1. Clone & install
@@ -64,86 +74,97 @@ cd lingala-stt
 python -m venv .venv && source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
 pip install -r requirements.txt
 
-# 2. Check existing audio files (automatically collected)
-ls data/raw/okapi/          # View downloaded MP3 files
-cat data/raw/okapi/manifest.json | jq '.[] | {filename, title, date}'
+# 2. Check existing audio files (automatically collected and stored to Google Drive)
+ls data/raw/okapi/lingala/   # View Lingala MP3 files
+ls data/raw/okapi/kikongo/   # View Kikongo MP3 files
+ls data/raw/okapi/tshiluba/  # View Tshiluba MP3 files
+cat data/raw/okapi/manifest.json | jq '.[] | {filename, title, date, language}'
 
-# 3. Process existing audio
-python scripts/segment.py data/raw/okapi/ \
-                          --out_dir data/interim/okapi \
+# 3. Process existing audio (specify language)
+python scripts/segment.py data/raw/okapi/lingala/ \
+                          --out_dir data/interim/okapi/lingala \
                           --batch_mode
 ```
 
 ### Option 2: Download Fresh Audio
 ```bash
-# Download latest 10 articles (working backwards from latest available)
+# Download latest 10 articles for all languages
 python scripts/download_okapi.py \
   --latest 10 \
   --out data/raw/okapi \
   --metadata \
-  --manifest
+  --manifest \
+  --languages lingala,kikongo,tshiluba
 
-# Download specific article range
+# Download specific article range for Lingala only
 python scripts/download_okapi.py \
   --start 1 \
   --end 10 \
   --out data/raw/okapi \
   --metadata \
   --manifest \
-  --incremental
+  --incremental \
+  --languages lingala
 
-# Test what's available
+# Test what's available across languages
 python scripts/download_okapi.py \
   --start 4 \
   --end 6 \
-  --out data/test
+  --out data/test \
+  --languages lingala,kikongo,tshiluba
 ```
 
 ---
+
 
 ## Automated Data Collection
 
 ### GitHub Actions Workflows
 
-**Two collection strategies:**
+**Two collection strategies with automatic Google Drive storage:**
 
 1. **`radio_okapi.yml`**: Forward-looking collection (5 AM UTC daily)
-   - Downloads latest available articles
-   - 20 articles per run
+   - Downloads latest available articles across all languages
+   - 20 articles per run per language
+   - Automatically syncs to Google Drive
 
 2. **`radio_okapi_daily.yml`**: Backward collection (6 AM & 6 PM UTC)
-   - Auto-detects latest available article
-   - Downloads 10 past articles per run
+   - Auto-detects latest available article per language
+   - Downloads 10 past articles per run per language
    - Safer approach, avoids 404 errors
+   - Automatically syncs to Google Drive
 
 ### Current Collection Status
-The system has successfully collected:
-- **Articles 1-6**: January 2023 broadcasts
-- **Recent files**: June 2025 broadcasts  
-- **Total**: ~8 audio files (Growing automatically)
+The system has successfully collected and stored to Google Drive:
+- **Lingala Articles 1-6**: January 2023 broadcasts
+- **Kikongo Articles 1-6**: January 2023 broadcasts  
+- **Tshiluba Articles 1-6**: January 2023 broadcasts
+- **Recent files**: June 2025 broadcasts across all languages
+- **Total**: ~24 audio files (Growing automatically)
 
 ### Manual Trigger
 Trigger collection manually via GitHub Actions:
 
-1. Go to **Actions** tab in the  repository
-2. Select **"Radio Okapi Daily Lingala Scraper"** 
+1. Go to **Actions** tab in the repository
+2. Select **"Radio Okapi Daily Multi-Language Scraper"** 
 3. Click **"Run workflow"**
 4. Configure parameters:
-   - **Article count**: `10` (how many past articles)
+   - **Article count**: `10` (how many past articles per language)
+   - **Languages**: `lingala,kikongo,tshiluba` (comma-separated)
    - **Start from**: Leave empty for auto-detection
    - **Force full scan**: `false`
 
 ### Local Scheduling
 For continuous local collection:
 ```bash
-# Run once
-python scripts/schedule_okapi.py --once
+# Run once for all languages
+python scripts/schedule_okapi.py --once --languages lingala,kikongo,tshiluba
 
 # Run continuously (daily interval)
-python scripts/schedule_okapi.py --interval daily
+python scripts/schedule_okapi.py --interval daily --languages lingala,kikongo,tshiluba
 
 # Run with custom interval
-python scripts/schedule_okapi.py --interval hourly
+python scripts/schedule_okapi.py --interval hourly --languages lingala,kikongo,tshiluba
 ```
 ---
 
@@ -151,29 +172,34 @@ python scripts/schedule_okapi.py --interval hourly
 
 | Metric | Current Value | Auto-Updated |
 |--------|---------------|--------------|
-| **Total Audio Files** | 8+ files | Every 12h |
-| **Article Range** | 1-6 (+ recent) | Growing |
+| **Total Audio Files** | 24+ files | Every 12h |
+| **Languages** | Lingala, Kikongo, Tshiluba | - |
+| **Article Range** | 1-6 per language (+ recent) | Growing |
 | **Collection Period** | Jan 2023 - Jun 2025 | Continuous |
-| **Language** | Lingala (ln) | - |
 | **Source Quality** | Radio broadcast | Professional |
 | **Average File Size** | ~2MB | Varies |
+| **Storage** | Google Drive | Automated |
 
-### Article URL Pattern
-Radio Okapi follows predictable URLs:
+### Article URL Patterns
+Radio Okapi follows predictable URLs per language:
 ```
 https://www.radiookapi.net/journal-journal-lingala/journal-lingala-matin-{NUMBER}
+https://www.radiookapi.net/journal-journal-kikongo/journal-kikongo-matin-{NUMBER}
+https://www.radiookapi.net/journal-journal-tshiluba/journal-tshiluba-matin-{NUMBER}
 ```
-
-**Strategy**: The system auto-detects the latest available article and works backwards to avoid 404 errors.
+**Strategy**: The system auto-detects the latest available article per language and works backwards to avoid 404 errors, with automatic storage to Google Drive.
 
 ---
 
-## 🔧 Development & Testing
+## Development & Testing
 
 ### Local Testing
 ```bash
-# Test scraper with small range
-python scripts/download_okapi.py --start 4 --end 6 --out data/test
+# Test scraper with small range for specific language
+python scripts/download_okapi.py --start 4 --end 6 --out data/test --languages lingala
+
+# Test all languages
+python scripts/download_okapi.py --start 4 --end 6 --out data/test --languages lingala,kikongo,tshiluba
 
 # Check logs
 tail -f logs/okapi_auto_*.log
@@ -201,7 +227,11 @@ brew install act
 # Test workflow locally
 act workflow_dispatch -j scrape-okapi --input article_count=2
 ```
+If you have github installed, you can run the workflow with:
 
+```bash
+gh workflow run radio_okapi_daily.yml --field article_count=2 --field languages=lingala,kikongo,tshiluba
+```
 ---
 
 ## Contributing
@@ -223,6 +253,10 @@ The current approach focuses on **historical articles** working backwards from t
 - ✅ Incremental growth
 - ✅ Reliable automation
 
+
+### Next Steps
+- Implement transcription pipeline
+- Add more languages (e.g., Kikongo dialects )
 ---
 
 ## License
