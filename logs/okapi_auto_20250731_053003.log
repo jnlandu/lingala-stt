@@ -1,0 +1,13 @@
+2025-07-31 05:30:03,377 - INFO - 🔍 Finding valid article range...
+2025-07-31 05:30:14,733 - INFO - 📊 Found article range: 9 to 19
+2025-07-31 05:30:14,734 - INFO - 🚀 Starting scrape of articles 10 to 19
+2025-07-31 05:30:14,734 - INFO - 📁 Output directory: data/raw/okapi
+2025-07-31 05:30:14,734 - INFO - 🧵 Using 3 threads
+2025-07-31 05:30:14,734 - INFO - 🔄 Incremental mode: True
+2025-07-31 05:30:14,734 - INFO - 📊 Processing 0 articles
+2025-07-31 05:30:14,737 - INFO - 📋 Generated manifest with 27 files
+2025-07-31 05:30:14,737 - INFO - 🎉 Scraping complete!
+2025-07-31 05:30:14,737 - INFO - ✅ Successful downloads: 0
+2025-07-31 05:30:14,737 - INFO - ❌ Failed downloads: 0
+2025-07-31 05:30:14,737 - INFO - 📁 Total files: 27
+2025-07-31 05:30:14,737 - INFO - 💾 Output directory: data/raw/okapi
