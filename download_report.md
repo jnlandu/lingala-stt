@@ -1,7 +1,9 @@
 # 📻 Radio Okapi Download Report
 
-**Run type:** Scheduled (every 12 hours)
-**Timestamp:** Sat Aug  9 05:23:05 UTC 2025
+**Run type:** Scheduled (every 12 hours - backward crawl)
+**Timestamp:** Sat Aug  9 06:30:36 UTC 2025
+**Latest article found:** 200
+**Articles processed:** 191-200
 **New files this run:** 27
 **Total audio files:** 27
 **Total dataset size:** 60M
@@ -18,7 +20,14 @@
 01022023-p-l-journallingalamatin-web.mp3
 20022023-p-l-journallingalamatin-web.mp3
 
-## ⏰ Schedule
-- Runs every 12 hours (6 AM & 6 PM UTC)
-- Downloads latest 20 articles per run
-- Uses incremental mode (skips existing files)
+## ⏰ Strategy
+- **Auto-detect latest:** Finds highest available article number
+- **Backward crawl:** Downloads past articles that exist
+- **Default count:** 10 articles per run
+- **Incremental:** Skips already downloaded files
+
+## 📊 Dataset Info
+- **Language:** Lingala (ln)
+- **Source:** Radio Okapi
+- **Format:** MP3
+- **Use case:** Speech-to-Text training
