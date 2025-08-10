@@ -2,9 +2,9 @@ name: Radio Okapi Daily Lingala Scraper
 
 on:
   # Run every 12 hours at 6 AM and 6 PM UTC
-  schedule:
-    - cron: '0 6 * * *'   # 6 AM UTC daily
-    - cron: '0 18 * * *'  # 6 PM UTC daily
+  # schedule:
+    # - cron: '0 6 * * *'   # 6 AM UTC daily
+    # - cron: '0 18 * * *'  # 6 PM UTC daily
   
   # Allow manual triggering
   workflow_dispatch:
