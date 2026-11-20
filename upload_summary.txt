@@ -1,3 +1,0 @@
-uploaded=0
-skipped=56
-folder_id=1mipC13iY8sypVhLF0WxkUOqYxnB-M9ld

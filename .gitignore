@@ -1,0 +1,4 @@
+# Audio is Radio Okapi copyright: rebuild locally with scripts/download_okapi.py, never commit it
+data/
+*.mp3
+*.wav

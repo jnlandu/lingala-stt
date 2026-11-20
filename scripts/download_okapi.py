@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 Automated Radio Okapi Lingala scraper with article number iteration
-Usage: python download_okapi_auto.py --start 190 --end 200 --out data/raw/okapi
+Usage: python scripts/download_okapi.py --start 190 --end 200 --out data/raw/okapi
 """
-# filepath: scripts/download_okapi_auto.py
+
 
 import re, sys, requests, json, time, argparse, logging
 from urllib.parse import urljoin
